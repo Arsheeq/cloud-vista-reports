@@ -5,13 +5,13 @@ import { CloudProvider } from '@/types';
 import { Cloud } from 'lucide-react';
 
 interface CloudSelectionProps {
-  selectedProvider: CloudProvider | null;
+  provider: CloudProvider | null;
   onProviderChange: (provider: CloudProvider) => void;
   onNext: () => void;
 }
 
 const CloudSelection: React.FC<CloudSelectionProps> = ({
-  selectedProvider,
+  provider,
   onProviderChange,
   onNext
 }) => {
@@ -33,7 +33,7 @@ const CloudSelection: React.FC<CloudSelectionProps> = ({
             Cloud Provider
           </label>
           <Select 
-            value={selectedProvider || undefined} 
+            value={provider || ''} 
             onValueChange={(value: CloudProvider) => onProviderChange(value)}
           >
             <SelectTrigger id="cloud-provider" className="w-full">
@@ -48,7 +48,7 @@ const CloudSelection: React.FC<CloudSelectionProps> = ({
 
         <Button 
           onClick={onNext} 
-          disabled={!selectedProvider}
+          disabled={!provider}
           className="w-full bg-nubinix-purple hover:bg-nubinix-purple/90"
         >
           Next
