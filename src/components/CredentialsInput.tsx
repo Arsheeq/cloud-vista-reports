@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CloudProvider, Credentials } from '@/types';
+import { CloudProvider, Credentials, InstanceData } from '@/types'; // Added InstanceData type
 import { Eye, EyeOff, Key, Lock } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 import { validateCredentials, fetchInstances } from '@/services/api';
@@ -15,6 +15,7 @@ interface CredentialsInputProps {
   onCredentialsChange: (credentials: Credentials) => void;
   onBack: () => void;
   onNext: () => void;
+  onInstancesUpdate: (instances: InstanceData) => void; // Added onInstancesUpdate prop
 }
 
 const CredentialsInput: React.FC<CredentialsInputProps> = ({
@@ -22,7 +23,8 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
   credentials,
   onCredentialsChange,
   onBack,
-  onNext
+  onNext,
+  onInstancesUpdate, // Using onInstancesUpdate prop
 }) => {
   const [isValidating, setIsValidating] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
@@ -37,6 +39,7 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
       console.log('Credentials validated, fetching instances');
       const instances = await fetchInstances(provider, credentials);
       console.log('Instances fetched:', instances);
+      onInstancesUpdate(instances); // Passing instances to parent component
       if (!instances.ec2Instances || instances.ec2Instances.length === 0) {
         setError('No instances found in any region. Please check your credentials and region.');
         setIsValidating(false);
@@ -129,7 +132,7 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
           </div>
         </div>
 
-        
+
 
         {provider === 'aws' && (
           <div className="flex items-center space-x-2 mb-4">

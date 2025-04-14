@@ -35,6 +35,15 @@ const Index = () => {
   });
   const [instances, setInstances] = useState<Instance[]>([]);
   const [rdsInstances, setRdsInstances] = useState<RDSInstance[]>([]);
+
+  const updateInstances = (newInstances: any) => {
+    if (newInstances?.ec2Instances) {
+      setInstances(newInstances.ec2Instances);
+    }
+    if (newInstances?.rdsInstances) {
+      setRdsInstances(newInstances.rdsInstances);
+    }
+  };
   const [frequency, setFrequency] = useState<ReportFrequency | null>(null);
 
   const handleProviderChange = (newProvider: CloudProvider) => {
@@ -87,6 +96,7 @@ const Index = () => {
             provider={provider!}
             credentials={credentials}
             onCredentialsChange={handleCredentialsChange}
+            onInstancesUpdate={updateInstances}
             onBack={() => goToStep('cloudSelection')}
             onNext={() => goToStep('instanceOverview')}
           />
