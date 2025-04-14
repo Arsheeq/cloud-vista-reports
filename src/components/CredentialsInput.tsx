@@ -129,17 +129,7 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="accountId" className="block text-sm font-medium text-gray-700">
-            {labels.optional}
-          </label>
-          <Input
-            id="accountId"
-            value={credentials.accountId || ''}
-            onChange={(e) => onCredentialsChange({ ...credentials, accountId: e.target.value })}
-            placeholder={`Enter your ${labels.optional}`}
-          />
-        </div>
+        
 
         {provider === 'aws' && (
           <div className="flex items-center space-x-2 mb-4">

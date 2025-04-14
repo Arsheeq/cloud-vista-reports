@@ -130,9 +130,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-2 py-4">
         <StepIndicator steps={steps} currentStep={currentStep} />
-        <div className="mt-8">{renderStep()}</div>
+        <div className="mt-4">{renderStep()}</div>
       </main>
       <Footer />
     </div>

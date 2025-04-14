@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { CloudProvider, Credentials, Instance, RDSInstance } from '@/types';
 
-const API_URL = window.location.protocol + '//' + window.location.hostname.replace('--', '-') + ':8000';
+const API_URL = window.location.protocol + '//' + window.location.hostname + ':8000';
 
 export const validateCredentials = async (provider: CloudProvider, credentials: Credentials) => {
   try {
