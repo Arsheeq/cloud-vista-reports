@@ -9,6 +9,7 @@ export interface Credentials {
 
 export interface Instance {
   id: string;
+  name: string;
   region: string;
   state: 'running' | 'stopped' | 'terminated' | 'pending';
   type: string;
