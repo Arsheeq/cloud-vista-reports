@@ -25,9 +25,6 @@ const steps = [
   { id: 'reportGeneration' as Step, label: 'Generate' },
 ];
 
-const [instances, setInstances] = useState<Instance[]>([]);
-const [rdsInstances, setRdsInstances] = useState<RDSInstance[]>([]);
-
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<Step>('cloudSelection');
   const [provider, setProvider] = useState<CloudProvider | null>(null);
@@ -36,8 +33,8 @@ const Index = () => {
     secretAccessKey: '',
     accountId: '',
   });
-  const [instances, setInstances] = useState<Instance[]>(mockInstances);
-  const [rdsInstances, setRdsInstances] = useState<RDSInstance[]>(mockRdsInstances);
+  const [instances, setInstances] = useState<Instance[]>([]);
+  const [rdsInstances, setRdsInstances] = useState<RDSInstance[]>([]);
   const [frequency, setFrequency] = useState<ReportFrequency | null>(null);
 
   const handleProviderChange = (newProvider: CloudProvider) => {
@@ -69,8 +66,8 @@ const Index = () => {
       secretAccessKey: '',
       accountId: '',
     });
-    setInstances(mockInstances.map(instance => ({ ...instance, selected: false })));
-    setRdsInstances(mockRdsInstances.map(instance => ({ ...instance, selected: false })));
+    setInstances([]);
+    setRdsInstances([]);
     setFrequency(null);
   };
 
