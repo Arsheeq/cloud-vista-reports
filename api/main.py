@@ -1,16 +1,9 @@
-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
 from pydantic import BaseModel
 import boto3
-from botocore.exceptions import ClientError
-from datetime import datetime, timedelta
-import sys
-import os
-
-# Add clio-main to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '../clio-main'))
+from botocore.exceptions import ClientError, NoCredentialsError
 
 app = FastAPI()
 
@@ -34,65 +27,56 @@ class Instance(BaseModel):
 @app.post("/api/validate-credentials")
 async def validate_credentials(credentials: Credentials):
     try:
-        # Create session with provided credentials
+        # Create boto3 session
         session = boto3.Session(
             aws_access_key_id=credentials.accessKeyId,
             aws_secret_access_key=credentials.secretAccessKey,
-            region_name='ap-south-1'
+            region_name='ap-south-1'  # Default region
         )
-        
-        # Test connection by listing EC2 regions
+
+        # Test credentials by listing regions (lightweight operation)
         ec2 = session.client('ec2')
         ec2.describe_regions()
-        
-        return {"valid": True, "message": "Credentials validated successfully"}
-    except ClientError as e:
-        error_code = e.response.get('Error', {}).get('Code', 'Unknown')
-        error_msg = e.response.get('Error', {}).get('Message', str(e))
-        raise HTTPException(status_code=400, detail=f"AWS Error ({error_code}): {error_msg}")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+
+        return {"valid": True, "message": "Successfully authenticated"}
+
+    except (ClientError, NoCredentialsError) as e:
+        error_msg = str(e)
+        raise HTTPException(status_code=401, detail=error_msg)
 
 @app.post("/api/instances/{provider}")
 async def get_instances(provider: str, credentials: Credentials):
     if provider != "aws":
         raise HTTPException(status_code=400, detail="Only AWS provider is supported")
-    
+
     try:
-        # Create session with provided credentials
         session = boto3.Session(
-            aws_access_key_id=credentials.access_key_id,
-            aws_secret_access_key=credentials.secret_access_key,
+            aws_access_key_id=credentials.accessKeyId,
+            aws_secret_access_key=credentials.secretAccessKey,
             region_name='ap-south-1'
         )
-        
-        # Test the credentials by making a simple API call
-        sts = session.client('sts')
-        sts.get_caller_identity()
-        
-        # Get EC2 instances
+
         ec2 = session.client('ec2')
-        ec2_instances = []
-        paginator = ec2.get_paginator('describe_instances')
-        
-        for page in paginator.paginate():
-            for reservation in page['Reservations']:
-                for instance in reservation['Instances']:
-                    name = next((tag['Value'] for tag in instance.get('Tags', []) 
-                               if tag['Key'] == 'Name'), instance['InstanceId'])
-                    ec2_instances.append({
-                        "id": instance['InstanceId'],
-                        "name": name,
-                        "region": 'ap-south-1',
-                        "state": instance['State']['Name'],
-                        "type": instance['InstanceType'],
-                        "selected": False
-                    })
-        
-        # Get RDS instances
         rds = session.client('rds')
+
+        # Get EC2 instances
+        ec2_instances = []
+        response = ec2.describe_instances()
+        for reservation in response['Reservations']:
+            for instance in reservation['Instances']:
+                name = next((tag['Value'] for tag in instance.get('Tags', []) 
+                           if tag['Key'] == 'Name'), instance['InstanceId'])
+                ec2_instances.append({
+                    "id": instance['InstanceId'],
+                    "name": name,
+                    "region": 'ap-south-1',
+                    "state": instance['State']['Name'],
+                    "type": instance['InstanceType'],
+                    "selected": False
+                })
+
+        # Get RDS instances
         rds_instances = []
-        
         try:
             rds_response = rds.describe_db_instances()
             for db in rds_response['DBInstances']:
@@ -109,18 +93,15 @@ async def get_instances(provider: str, credentials: Credentials):
         except ClientError:
             # Continue even if RDS access fails
             pass
-            
+
         return {
             "ec2Instances": ec2_instances,
             "rdsInstances": rds_instances
         }
-        
+
     except ClientError as e:
-        error_code = e.response.get('Error', {}).get('Code', 'Unknown')
-        error_msg = e.response.get('Error', {}).get('Message', str(e))
-        raise HTTPException(status_code=400, detail=f"AWS Error ({error_code}): {error_msg}")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        error_msg = str(e)
+        raise HTTPException(status_code=401, detail=error_msg)
 
 @app.post("/api/generate-report")
 async def generate_report(provider: str, credentials: Credentials, selected_instances: List[Instance]):
