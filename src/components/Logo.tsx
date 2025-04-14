@@ -13,11 +13,11 @@ const Logo: React.FC<LogoProps> = ({ size = 'medium' }) => {
   };
 
   return (
-    <div className={`${dimensions[size]} transition-all duration-300`}>
+    <div className={`${dimensions[size]} mx-auto`}>
       <img 
         src="/lovable-uploads/3416d038-01be-47dd-85da-562cb4346ba8.png" 
         alt="Nubinix Logo" 
-        className="w-full h-auto brightness-110 contrast-125 transition-all duration-300"
+        className="w-full h-auto"
       />
     </div>
   );
