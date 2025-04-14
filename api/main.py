@@ -5,10 +5,16 @@ from typing import List, Optional
 from pydantic import BaseModel
 import boto3
 from botocore.exceptions import ClientError
+from datetime import datetime, timedelta
+import sys
+import os
+
+# Add clio-main to path
+sys.path.append(os.path.join(os.path.dirname(__file__), '../clio-main'))
+from app.provider.aws.client import Client
 
 app = FastAPI()
 
-# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,8 +39,7 @@ async def validate_credentials(credentials: Credentials):
             aws_access_key_id=credentials.accessKeyId,
             aws_secret_access_key=credentials.secretAccessKey,
         )
-        ec2 = session.client('ec2', region_name='us-east-1')
-        # Test connection by listing regions
+        ec2 = session.client('ec2', region_name='ap-south-1')
         ec2.describe_regions()
         return {"valid": True, "message": "Credentials validated successfully"}
     except ClientError as e:
@@ -46,69 +51,53 @@ async def get_instances(provider: str, credentials: Credentials):
         raise HTTPException(status_code=400, detail="Only AWS provider is supported")
     
     try:
-        session = boto3.Session(
-            aws_access_key_id=credentials.accessKeyId,
-            aws_secret_access_key=credentials.secretAccessKey,
-        )
+        client = Client(region="ap-south-1", account_id=credentials.accountId)
+        client.secrets = {
+            'access_key': credentials.accessKeyId,
+            'secret_key': credentials.secretAccessKey
+        }
         
         # Get EC2 instances
-        ec2 = session.client('ec2', region_name='us-east-1')
-        regions = [region['RegionName'] for region in ec2.describe_regions()['Regions']]
-        
         ec2_instances = []
-        rds_instances = []
+        instance_ids = client.get_running_ec2_instance_ids()
         
-        for region in regions:
-            regional_ec2 = session.client('ec2', region_name=region)
-            regional_rds = session.client('rds', region_name=region)
+        for instance_id in instance_ids:
+            instance_info = client.get_instance_info(instance_id)
+            ec2_instances.append({
+                "id": instance_info["id"],
+                "name": instance_info["name"],
+                "region": "ap-south-1",
+                "state": instance_info["state"],
+                "type": instance_info["type"],
+                "selected": False
+            })
+        
+        # Get RDS instances
+        rds_instances = []
+        for rds in client.get_rds_instances():
+            rds_instances.append({
+                "id": rds["id"],
+                "name": rds["id"],
+                "region": "ap-south-1",
+                "state": rds["status"],
+                "type": rds["type"],
+                "engine": rds["engine"],
+                "size": f"{rds.get('allocated_storage', 'N/A')}GB",
+                "selected": False
+            })
             
-            # Get EC2 instances
-            paginator = regional_ec2.get_paginator('describe_instances')
-            for page in paginator.paginate():
-                for reservation in page['Reservations']:
-                    for instance in reservation['Instances']:
-                        name = ''
-                        for tag in instance.get('Tags', []):
-                            if tag['Key'] == 'Name':
-                                name = tag['Value']
-                                break
-                                
-                        ec2_instances.append({
-                            "id": instance['InstanceId'],
-                            "name": name or instance['InstanceId'],
-                            "region": region,
-                            "state": instance['State']['Name'],
-                            "type": instance['InstanceType'],
-                            "selected": False
-                        })
-            
-            # Get RDS instances
-            try:
-                rds_response = regional_rds.describe_db_instances()
-                for db in rds_response['DBInstances']:
-                    rds_instances.append({
-                        "id": db['DBInstanceIdentifier'],
-                        "name": db.get('DBName', db['DBInstanceIdentifier']),
-                        "region": region,
-                        "state": db['DBInstanceStatus'],
-                        "type": db['DBInstanceClass'],
-                        "engine": db['Engine'],
-                        "size": f"{db['AllocatedStorage']}GB",
-                        "selected": False
-                    })
-            except ClientError:
-                continue
-                
         return {
             "ec2Instances": ec2_instances,
             "rdsInstances": rds_instances
         }
         
-    except ClientError as e:
+    except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/generate-report")
 async def generate_report(provider: str, credentials: Credentials, selected_instances: List[Instance]):
-    # For now, just return success
-    # You can implement actual report generation later
-    return {"status": "success", "message": "Report generated successfully"}
+    try:
+        # This will be implemented to generate actual reports using your ConsolidatedCloudReport class
+        return {"status": "success", "message": "Report generated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
