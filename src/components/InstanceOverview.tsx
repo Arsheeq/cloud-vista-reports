@@ -193,8 +193,9 @@ const InstanceOverview: React.FC<InstanceOverviewProps> = ({
                     onCheckedChange={(checked) => handleEc2SelectAll(!!checked)}
                   />
                 </div>
-                <div className="col-span-4 font-medium">Instance ID</div>
-                <div className="col-span-3 font-medium">Region</div>
+                <div className="col-span-3 font-medium">Instance ID</div>
+                <div className="col-span-2 font-medium">Name</div>
+                <div className="col-span-2 font-medium">Region</div>
                 <div className="col-span-2 font-medium">Type</div>
                 <div className="col-span-2 font-medium">State</div>
               </div>
@@ -214,8 +215,9 @@ const InstanceOverview: React.FC<InstanceOverviewProps> = ({
                           onCheckedChange={(checked) => handleEc2SelectOne(instance.id, !!checked)}
                         />
                       </div>
-                      <div className="col-span-4 truncate">{instance.id}</div>
-                      <div className="col-span-3">{instance.region}</div>
+                      <div className="col-span-3 truncate">{instance.id}</div>
+                      <div className="col-span-2">{instance.name}</div>
+                      <div className="col-span-2">{instance.region}</div>
                       <div className="col-span-2">{instance.type}</div>
                       <div className="col-span-2 flex items-center">
                         <span className={`inline-block w-2 h-2 rounded-full ${getStateColor(instance.state)} mr-2`}></span>
