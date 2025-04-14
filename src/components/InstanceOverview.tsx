@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -29,7 +28,6 @@ const InstanceOverview: React.FC<InstanceOverviewProps> = ({
   const [localInstances, setLocalInstances] = useState<Instance[]>(instances);
   const [localRdsInstances, setLocalRdsInstances] = useState<RDSInstance[]>(rdsInstances);
 
-  // Simulate loading data
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -95,7 +93,9 @@ const InstanceOverview: React.FC<InstanceOverviewProps> = ({
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-nubinix-blue/10 mb-4">
           <Server size={32} className="text-nubinix-blue" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">Cloud Resources</h2>
+        <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
+          Cloud Resources
+        </h2>
         <p className="text-gray-500">
           Select the resources you want to include in your report.
         </p>

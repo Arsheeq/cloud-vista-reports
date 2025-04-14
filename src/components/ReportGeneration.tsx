@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { CloudProvider, ReportFrequency } from '@/types';
@@ -23,7 +22,6 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({
   const [isGenerated, setIsGenerated] = useState(false);
   const { toast } = useToast();
 
-  // Simulate report generation
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsGenerating(false);
@@ -43,9 +41,7 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({
       description: "Your report will be downloaded shortly.",
     });
     
-    // Simulate download delay
     setTimeout(() => {
-      // In a real app, this would trigger a file download
       console.log("Downloading report...");
     }, 500);
   };
@@ -55,7 +51,9 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({
       {isGenerating ? (
         <div className="text-center py-8">
           <LoadingSpinner size="large" />
-          <h2 className="text-2xl font-bold mt-6 mb-2">Generating Your Report</h2>
+          <h2 className="text-2xl font-bold mt-6 mb-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
+            Generating Your Report
+          </h2>
           <p className="text-gray-500 mb-8">
             Please wait while we analyze your {provider === 'aws' ? 'AWS' : 'Azure'} resources and generate your {frequency} report.
           </p>
@@ -69,7 +67,9 @@ const ReportGeneration: React.FC<ReportGenerationProps> = ({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-6">
             <Check size={32} className="text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">Report Generated Successfully!</h2>
+          <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
+            Report Generated Successfully!
+          </h2>
           <p className="text-gray-500 mb-8">
             Your {frequency} {provider === 'aws' ? 'AWS' : 'Azure'} cloud report is ready. You can download it now.
           </p>

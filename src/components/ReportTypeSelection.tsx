@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ReportFrequency } from '@/types';
@@ -25,7 +24,9 @@ const ReportTypeSelection: React.FC<ReportTypeSelectionProps> = ({
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-nubinix-blue/10 mb-4">
           <FileText size={32} className="text-nubinix-blue" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">Choose Report Frequency</h2>
+        <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
+          Choose Report Frequency
+        </h2>
         <p className="text-gray-500">
           Select how often you want your report to be generated.
         </p>

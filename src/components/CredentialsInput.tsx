@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,7 +61,9 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-nubinix-blue/10 mb-4">
           <Key size={32} className="text-nubinix-blue" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">{labels.title}</h2>
+        <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
+          {labels.title}
+        </h2>
         <p className="text-gray-500">
           Enter your credentials to connect to your {provider === 'aws' ? 'AWS' : 'Azure'} account.
         </p>
