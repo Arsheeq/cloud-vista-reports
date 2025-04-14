@@ -141,12 +141,15 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-background/90">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMDIwMjAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0aDR2MWgtNHYtMXptMC0yaDF2NGgtMXYtNHptMi0xaDJ2MWgtMnYtMXptLTIgMWgxdjFoLTF2LTF6bS0zIDBoMXYxaC0xdi0xem0tMiAwaDF2MWgtMXYtMXptLTItMmgxdjFoLTF2LTF6bS0yIDBoMXYxaC0xdi0xem0xNi04aDJ2MWgtM3YtMWgxem0tMTAtOGgxdjFoLTF2LTF6bTQgMGgxdjFoLTF2LTF6bS00IDRoMXYxaC0xdi0xem0wIDZoMXYxaC0xdi0xem0tMi00aDF2MWgtMXYtMXptMi0xMGgxdjFoLTF2LTF6bS02IDloMXYxaC0xdi0xem04IDJoMXYxaC0xdi0xem0yIDJoMXYxaC0xdi0xem0tMi0yaDF2MWgtMXYtMXptLTItMmgxdjFoLTF2LTF6bS05IDJoMXYxaC0xdi0xem0xMCAwaDJ2MWgtMnYtMXptLTMtMmgxdjJoLTF2LTJ6bS0xLTZoMXYxaC0xdi0xem0tMiAwaDF2MWgtMXYtMXptLTEgOGgxdjFoLTF2LTF6bS0yLTExaDF2MmgtMXYtMnptLTEgM2gxdjJoLTF2LTJ6bTE2LThoMXYxaC0xdi0xem0tOCAwaDF2MWgtMXYtMXptMiAwaDF2MWgtMXYtMXptLTktMmgxdjFoLTF2LTF6bTEwIDBoMXYxaC0xdi0xem0yIDBoMXYxaC0xdi0xem0tMiA0aDF2MWgtMXYtMXptMCAxNmgxdjFoLTF2LTF6bTAgOGgxdjFoLTF2LTF6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30 pointer-events-none"></div>
       <Header />
-      <main className="flex-1 container py-8">
+      <main className="flex-1 container py-8 relative z-10">
         <div className="max-w-4xl mx-auto">
           <StepIndicator currentStep={currentStep} steps={steps} />
-          {renderStepContent()}
+          <div className="glass-morphism p-6 mt-8 rounded-xl">
+            {renderStepContent()}
+          </div>
         </div>
       </main>
       <Footer />
