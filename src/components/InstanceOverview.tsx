@@ -75,17 +75,81 @@ const InstanceOverview: React.FC<InstanceOverviewProps> = ({
   const anySelected = localInstances.some(instance => instance.selected) || localRdsInstances.some(instance => instance.selected);
 
   const getStateColor = (state: string) => {
-    switch (state) {
+    switch (state.toLowerCase()) {
       case 'running':
         return 'bg-green-500';
       case 'stopped':
         return 'bg-red-500';
       case 'pending':
         return 'bg-yellow-500';
+      case 'terminated':
+        return 'bg-red-700';
       default:
         return 'bg-gray-500';
     }
   };
+
+  const renderInstanceTable = (instances: Instance[]) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[50px]"><Checkbox checked={allEc2Selected} onCheckedChange={handleSelectAllEc2} /></TableHead>
+          <TableHead>Instance ID</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Region</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>State</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {instances.map((instance) => (
+          <TableRow key={instance.id}>
+            <TableCell><Checkbox checked={instance.selected} onCheckedChange={(checked) => handleEc2SelectOne(instance.id, !!checked)} /></TableCell>
+            <TableCell>{instance.id}</TableCell>
+            <TableCell>{instance.name}</TableCell>
+            <TableCell>{instance.region}</TableCell>
+            <TableCell>{instance.type}</TableCell>
+            <TableCell>
+              <span className={`px-2 py-1 rounded-full text-white text-sm ${getStateColor(instance.state)}`}>
+                {instance.state}
+              </span>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+
+  const renderRdsTable = (instances: RDSInstance[]) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[50px]"><Checkbox checked={allRdsSelected} onCheckedChange={handleSelectAllRds} /></TableHead>
+          <TableHead>Instance ID</TableHead>
+          <TableHead>Region</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Engine</TableHead>
+          <TableHead>State</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {instances.map((instance) => (
+          <TableRow key={instance.id}>
+            <TableCell><Checkbox checked={instance.selected} onCheckedChange={(checked) => handleRdsSelectOne(instance.id, !!checked)} /></TableCell>
+            <TableCell>{instance.id}</TableCell>
+            <TableCell>{instance.region}</TableCell>
+            <TableCell>{instance.type}</TableCell>
+            <TableCell>{instance.engine}</TableCell>
+            <TableCell>
+              <span className={`px-2 py-1 rounded-full text-white text-sm ${getStateColor(instance.state)}`}>
+                {instance.state}
+              </span>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
 
   return (
     <div className="bg-white rounded-lg shadow-md p-8 mx-auto w-full max-w-4xl">
