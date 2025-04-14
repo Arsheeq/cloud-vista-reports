@@ -4,6 +4,10 @@ import { Input } from '@/components/ui/input';
 import { CloudProvider, Credentials } from '@/types';
 import { Eye, EyeOff, Key, Lock } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
+import { validateCredentials, fetchInstances } from '@/services/api';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@radix-ui/react-select'
+import { Globe } from 'lucide-react';
+
 
 interface CredentialsInputProps {
   provider: CloudProvider;
@@ -22,16 +26,27 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
 }) => {
   const [isValidating, setIsValidating] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
+  const [error, setError] = useState('');
 
   const handleCheckInstances = async () => {
     setIsValidating(true);
+    setError('');
     try {
+      console.log('Starting validation with credentials');
       await validateCredentials(provider, credentials);
+      console.log('Credentials validated, fetching instances');
       const instances = await fetchInstances(provider, credentials);
+      console.log('Instances fetched:', instances);
+      if (!instances.ec2Instances || instances.ec2Instances.length === 0) {
+        setError('No instances found in any region. Please check your credentials and region.');
+        setIsValidating(false);
+        return;
+      }
       setIsValidating(false);
       onNext();
-    } catch (error) {
-      console.error('Error validating credentials:', error);
+    } catch (error: any) {
+      console.error('Error in handleCheckInstances:', error);
+      setError(error.message || 'An error occurred while fetching instances');
       setIsValidating(false);
     }
   };
@@ -57,6 +72,13 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
   };
 
   const labels = getProviderLabel();
+
+  const AWS_REGIONS = [
+    { value: 'us-east-1', label: 'US East (N. Virginia)' },
+    { value: 'us-west-2', label: 'US West (Oregon)' },
+    { value: 'me-central-1', label: 'Middle East (Central)' }, // Added me-central-1
+    // Add other regions as needed
+  ];
 
   return (
     <div className="bg-white rounded-lg shadow-md p-8 max-w-md mx-auto">
@@ -119,17 +141,44 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
           />
         </div>
 
+        {provider === 'aws' && (
+          <div className="flex items-center space-x-2 mb-4">
+            <Globe className="w-4 h-4 text-gray-500" />
+            <Select
+              value={credentials.region || 'us-east-1'}
+              onValueChange={(value) => onCredentialsChange({ ...credentials, region: value })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a region" />
+              </SelectTrigger>
+              <SelectContent>
+                {AWS_REGIONS.map((region) => (
+                  <SelectItem key={region.value} value={region.value}>
+                    {region.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
         <div className="flex space-x-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={onBack}
             className="flex-1"
             disabled={isValidating}
           >
             Back
           </Button>
-          <Button 
-            onClick={handleCheckInstances} 
+          <Button
+            onClick={handleCheckInstances}
             disabled={!isFormValid || isValidating}
             className="flex-1 bg-nubinix-purple hover:bg-nubinix-purple/90"
           >

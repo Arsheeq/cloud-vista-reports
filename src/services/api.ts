@@ -2,25 +2,33 @@
 import axios from 'axios';
 import { CloudProvider, Credentials, Instance, RDSInstance } from '@/types';
 
-const API_URL = import.meta.env.PROD ? '/api' : 'http://localhost:8000/api';
+const API_URL = window.location.protocol + '//' + window.location.hostname.replace('--', '-') + ':8000';
 
 export const validateCredentials = async (provider: CloudProvider, credentials: Credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/validate-credentials`, {
-      access_key_id: credentials.accessKeyId,
-      secret_access_key: credentials.secretAccessKey,
-      account_id: credentials.accountId
-    });
+    const response = await axios.post(`${API_URL}/validate-credentials`, credentials);
     return response.data;
-  } catch (error) {
-    console.error('Validation error:', error);
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.detail || 'Failed to validate credentials');
+    }
     throw error;
   }
 };
 
 export const fetchInstances = async (provider: CloudProvider, credentials: Credentials) => {
-  const response = await axios.post(`${API_URL}/instances/${provider}`, credentials);
-  return response.data;
+  try {
+    console.log('Fetching instances with credentials:', { ...credentials, secretAccessKey: '***' });
+    const response = await axios.post(`${API_URL}/instances`, credentials);
+    console.log('Received instances:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching instances:', error);
+    if (error.response) {
+      throw new Error(error.response.data.detail || 'Failed to fetch instances');
+    }
+    throw error;
+  }
 };
 
 export const generateReport = async (
@@ -28,10 +36,17 @@ export const generateReport = async (
   credentials: Credentials,
   selectedInstances: (Instance | RDSInstance)[]
 ) => {
-  const response = await axios.post(`${API_URL}/generate-report`, {
-    provider,
-    credentials,
-    selected_instances: selectedInstances
-  });
-  return response.data;
+  try {
+    const response = await axios.post(`${API_URL}/generate-report`, {
+      provider,
+      credentials,
+      selected_instances: selectedInstances
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.detail || 'Failed to generate report');
+    }
+    throw error;
+  }
 };
