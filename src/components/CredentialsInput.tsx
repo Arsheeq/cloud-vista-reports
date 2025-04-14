@@ -25,12 +25,15 @@ const CredentialsInput: React.FC<CredentialsInputProps> = ({
 
   const handleCheckInstances = async () => {
     setIsValidating(true);
-    
-    // Simulate API validation delay
-    setTimeout(() => {
+    try {
+      await validateCredentials(provider, credentials);
+      const instances = await fetchInstances(provider, credentials);
       setIsValidating(false);
       onNext();
-    }, 1500);
+    } catch (error) {
+      console.error('Error validating credentials:', error);
+      setIsValidating(false);
+    }
   };
 
   const isFormValid = credentials.accessKeyId && credentials.secretAccessKey;

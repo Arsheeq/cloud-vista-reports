@@ -25,20 +25,8 @@ const steps = [
   { id: 'reportGeneration' as Step, label: 'Generate' },
 ];
 
-// Sample mock data for demo
-const mockInstances: Instance[] = [
-  { id: 'i-123456789abc', name: 'Web Server 1', region: 'us-east-1', state: 'running', type: 't2.micro', selected: false },
-  { id: 'i-234567890abc', name: 'App Server 1', region: 'us-east-1', state: 'stopped', type: 't3.small', selected: false },
-  { id: 'i-345678901abc', name: 'DB Server 1', region: 'us-west-2', state: 'running', type: 'm5.large', selected: false },
-  { id: 'i-456789012abc', name: 'Worker Node 1', region: 'eu-west-1', state: 'running', type: 'c5.xlarge', selected: false },
-  { id: 'i-567890123abc', name: 'Cache Server 1', region: 'ap-south-1', state: 'terminated', type: 'r5.large', selected: false },
-];
-
-const mockRdsInstances: RDSInstance[] = [
-  { id: 'db-123456789abc', name: 'Production DB', region: 'us-east-1', state: 'running', type: 'db.t3.micro', engine: 'mysql', size: '20GB', selected: false },
-  { id: 'db-234567890abc', name: 'Staging DB', region: 'us-east-1', state: 'stopped', type: 'db.t3.small', engine: 'postgres', size: '50GB', selected: false },
-  { id: 'db-345678901abc', name: 'Development DB', region: 'us-west-2', state: 'running', type: 'db.m5.large', engine: 'aurora', size: '100GB', selected: false },
-];
+const [instances, setInstances] = useState<Instance[]>([]);
+const [rdsInstances, setRdsInstances] = useState<RDSInstance[]>([]);
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<Step>('cloudSelection');
