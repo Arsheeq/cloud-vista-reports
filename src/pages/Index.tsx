@@ -35,9 +35,9 @@ const mockInstances: Instance[] = [
 ];
 
 const mockRdsInstances: RDSInstance[] = [
-  { id: 'db-123456789abc', region: 'us-east-1', state: 'running', type: 'db.t3.micro', engine: 'mysql', size: '20GB', selected: false },
-  { id: 'db-234567890abc', region: 'us-east-1', state: 'stopped', type: 'db.t3.small', engine: 'postgres', size: '50GB', selected: false },
-  { id: 'db-345678901abc', region: 'us-west-2', state: 'running', type: 'db.m5.large', engine: 'aurora', size: '100GB', selected: false },
+  { id: 'db-123456789abc', name: 'Production DB', region: 'us-east-1', state: 'running', type: 'db.t3.micro', engine: 'mysql', size: '20GB', selected: false },
+  { id: 'db-234567890abc', name: 'Staging DB', region: 'us-east-1', state: 'stopped', type: 'db.t3.small', engine: 'postgres', size: '50GB', selected: false },
+  { id: 'db-345678901abc', name: 'Development DB', region: 'us-west-2', state: 'running', type: 'db.m5.large', engine: 'aurora', size: '100GB', selected: false },
 ];
 
 const Index = () => {

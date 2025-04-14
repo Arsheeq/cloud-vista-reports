@@ -241,10 +241,11 @@ const InstanceOverview: React.FC<InstanceOverviewProps> = ({
                   />
                 </div>
                 <div className="col-span-3 font-medium">Instance ID</div>
+                <div className="col-span-2 font-medium">Name</div>
                 <div className="col-span-2 font-medium">Region</div>
-                <div className="col-span-2 font-medium">Engine</div>
+                <div className="col-span-1 font-medium">Engine</div>
                 <div className="col-span-2 font-medium">Size</div>
-                <div className="col-span-2 font-medium">State</div>
+                <div className="col-span-1 font-medium">State</div>
               </div>
 
               {localRdsInstances.length === 0 ? (
@@ -263,10 +264,11 @@ const InstanceOverview: React.FC<InstanceOverviewProps> = ({
                         />
                       </div>
                       <div className="col-span-3 truncate">{instance.id}</div>
+                      <div className="col-span-2">{instance.name}</div>
                       <div className="col-span-2">{instance.region}</div>
-                      <div className="col-span-2">{instance.engine}</div>
+                      <div className="col-span-1">{instance.engine}</div>
                       <div className="col-span-2">{instance.size}</div>
-                      <div className="col-span-2 flex items-center">
+                      <div className="col-span-1 flex items-center">
                         <span className={`inline-block w-2 h-2 rounded-full ${getStateColor(instance.state)} mr-2`}></span>
                         <span className="capitalize">{instance.state}</span>
                       </div>
