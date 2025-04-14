@@ -61,10 +61,14 @@ async def get_instances(provider: str, credentials: Credentials):
     try:
         # Create session with provided credentials
         session = boto3.Session(
-            aws_access_key_id=credentials.accessKeyId,
-            aws_secret_access_key=credentials.secretAccessKey,
+            aws_access_key_id=credentials.access_key_id,
+            aws_secret_access_key=credentials.secret_access_key,
             region_name='ap-south-1'
         )
+        
+        # Test the credentials by making a simple API call
+        sts = session.client('sts')
+        sts.get_caller_identity()
         
         # Get EC2 instances
         ec2 = session.client('ec2')
