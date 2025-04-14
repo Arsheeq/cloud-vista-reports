@@ -71,12 +71,12 @@ const Index = () => {
     setFrequency(null);
   };
 
-  const renderStepContent = () => {
+  const renderStep = () => {
     switch (currentStep) {
       case 'cloudSelection':
         return (
           <CloudSelection
-            selectedProvider={provider}
+            provider={provider}
             onProviderChange={handleProviderChange}
             onNext={() => goToStep('credentialsInput')}
           />
@@ -95,6 +95,7 @@ const Index = () => {
         return (
           <InstanceOverview
             provider={provider!}
+            credentials={credentials}
             instances={instances}
             rdsInstances={rdsInstances}
             onInstanceSelectionChange={handleInstanceSelectionChange}
@@ -115,24 +116,23 @@ const Index = () => {
         return (
           <ReportGeneration
             provider={provider!}
+            credentials={credentials}
+            instances={instances}
+            rdsInstances={rdsInstances}
             frequency={frequency!}
             onBack={() => goToStep('reportTypeSelection')}
             onReset={resetWizard}
           />
         );
-      default:
-        return null;
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="flex-1 container py-8">
-        <div className="max-w-4xl mx-auto">
-          <StepIndicator currentStep={currentStep} steps={steps} />
-          {renderStepContent()}
-        </div>
+      <main className="container mx-auto px-4 py-8">
+        <StepIndicator steps={steps} currentStep={currentStep} />
+        <div className="mt-8">{renderStep()}</div>
       </main>
       <Footer />
     </div>
