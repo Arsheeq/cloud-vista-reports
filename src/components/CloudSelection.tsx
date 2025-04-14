@@ -4,7 +4,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CloudProvider } from '@/types';
 import { Cloud } from 'lucide-react';
 
-const CloudSelection: React.FC<CloudProvider> = ({
+interface CloudSelectionProps {
+  selectedProvider: CloudProvider | null;
+  onProviderChange: (provider: CloudProvider) => void;
+  onNext: () => void;
+}
+
+const CloudSelection: React.FC<CloudSelectionProps> = ({
   selectedProvider,
   onProviderChange,
   onNext
