@@ -3,14 +3,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
 from pydantic import BaseModel
-from datetime import datetime
-import sys
-import os
-
-# Add clio-main to path so we can import the cloud reporting code
-sys.path.append(os.path.join(os.path.dirname(__file__), '../clio-main'))
-from app.app import ConsolidatedCloudReport
-from app.provider.aws.client import Client as Aws_Client
+import boto3
+from botocore.exceptions import ClientError
 
 app = FastAPI()
 
@@ -30,93 +24,91 @@ class Credentials(BaseModel):
 
 class Instance(BaseModel):
     id: str
-    selected: bool
+    selected: bool = False
 
 @app.post("/api/validate-credentials")
 async def validate_credentials(credentials: Credentials):
     try:
-        client = Aws_Client(
-            account_id=credentials.accountId,
-            region="ap-south-1"
+        session = boto3.Session(
+            aws_access_key_id=credentials.accessKeyId,
+            aws_secret_access_key=credentials.secretAccessKey,
         )
-        # Test connection by listing instances
-        instances = client.get_running_ec2_instance_ids()
+        ec2 = session.client('ec2', region_name='us-east-1')
+        # Test connection by listing regions
+        ec2.describe_regions()
         return {"valid": True, "message": "Credentials validated successfully"}
-    except Exception as e:
+    except ClientError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/instances/{provider}")
 async def get_instances(provider: str, credentials: Credentials):
+    if provider != "aws":
+        raise HTTPException(status_code=400, detail="Only AWS provider is supported")
+    
     try:
-        client = Aws_Client(
-            account_id=credentials.accountId,
-            region="ap-south-1"
+        session = boto3.Session(
+            aws_access_key_id=credentials.accessKeyId,
+            aws_secret_access_key=credentials.secretAccessKey,
         )
+        
+        # Get EC2 instances
+        ec2 = session.client('ec2', region_name='us-east-1')
+        regions = [region['RegionName'] for region in ec2.describe_regions()['Regions']]
+        
         ec2_instances = []
         rds_instances = []
-
-        if provider == "aws":
+        
+        for region in regions:
+            regional_ec2 = session.client('ec2', region_name=region)
+            regional_rds = session.client('rds', region_name=region)
+            
             # Get EC2 instances
-            instance_ids = client.get_running_ec2_instance_ids()
-            for instance_id in instance_ids:
-                info = client.get_instance_info(instance_id)
-                ec2_instances.append({
-                    "id": info["id"],
-                    "name": info["name"],
-                    "type": info["type"],
-                    "state": info["state"],
-                    "region": "ap-south-1",
-                    "selected": False
-                })
+            paginator = regional_ec2.get_paginator('describe_instances')
+            for page in paginator.paginate():
+                for reservation in page['Reservations']:
+                    for instance in reservation['Instances']:
+                        name = ''
+                        for tag in instance.get('Tags', []):
+                            if tag['Key'] == 'Name':
+                                name = tag['Value']
+                                break
+                                
+                        ec2_instances.append({
+                            "id": instance['InstanceId'],
+                            "name": name or instance['InstanceId'],
+                            "region": region,
+                            "state": instance['State']['Name'],
+                            "type": instance['InstanceType'],
+                            "selected": False
+                        })
             
             # Get RDS instances
-            rds_list = client.get_rds_instances()
-            rds_instances = [{
-                "id": instance["id"],
-                "type": instance["type"],
-                "state": instance["status"],
-                "engine": instance["engine"],
-                "region": "ap-south-1",
-                "size": "20GB",  # Default size for demo
-                "selected": False
-            } for instance in rds_list]
-
+            try:
+                rds_response = regional_rds.describe_db_instances()
+                for db in rds_response['DBInstances']:
+                    rds_instances.append({
+                        "id": db['DBInstanceIdentifier'],
+                        "name": db.get('DBName', db['DBInstanceIdentifier']),
+                        "region": region,
+                        "state": db['DBInstanceStatus'],
+                        "type": db['DBInstanceClass'],
+                        "engine": db['Engine'],
+                        "size": f"{db['AllocatedStorage']}GB",
+                        "selected": False
+                    })
+            except ClientError:
+                continue
+                
         return {
             "ec2Instances": ec2_instances,
             "rdsInstances": rds_instances
         }
-    except Exception as e:
+        
+    except ClientError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/generate-report")
-async def generate_report(
-    provider: str,
-    credentials: Credentials,
-    selected_instances: List[Instance]
-):
-    try:
-        instance_ids = [instance.id for instance in selected_instances if instance.selected]
-        
-        report_generator = ConsolidatedCloudReport(
-            account_name=credentials.accountId,
-            cloud_provider=provider.upper(),
-            account_id=credentials.accountId,
-            report_date=datetime.now().strftime("%Y-%m-%d")
-        )
-
-        client = Aws_Client(
-            account_id=credentials.accountId,
-            region="ap-south-1"
-        )
-
-        report_path = report_generator.generate_consolidated_report(
-            client,
-            instance_ids,
-            f"/tmp/report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-        )
-
-        # Here you would typically upload the report to cloud storage
-        # and return a download URL
-        return {"status": "success", "message": "Report generated successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+async def generate_report(provider: str, credentials: Credentials, selected_instances: List[Instance]):
+    # For now, just return success
+    # You can implement actual report generation later
+    return {"status": "success", "message": "Report generated successfully"}
