@@ -1,0 +1,6 @@
+venv/*
+package
+__pycache__
+
+aws/
+report
