@@ -1,0 +1,28 @@
+modules = ["python-3.12", "nodejs-20", "web"]
+run = "npm run dev"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run dev"]
+
+[workflows]
+runButton = "Run"
+
+[[workflows.workflow]]
+name = "Run"
+author = 41562263
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install && npm run dev"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd api && python main.py"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

@@ -1,102 +1,76 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ReportFrequency } from '@/types';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CalendarDays, Calendar, FileText } from 'lucide-react';
-import { Label } from '@/components/ui/label';
 
 interface ReportTypeSelectionProps {
-  frequency: ReportFrequency | null;
-  onFrequencyChange: (frequency: ReportFrequency) => void;
+  reportType: 'utilization' | 'billing' | null;
+  onReportTypeChange: (type: 'utilization' | 'billing') => void;
   onBack: () => void;
   onNext: () => void;
 }
 
 const ReportTypeSelection: React.FC<ReportTypeSelectionProps> = ({
-  frequency,
-  onFrequencyChange,
+  reportType,
+  onReportTypeChange,
   onBack,
-  onNext
+  onNext,
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-8 max-w-md mx-auto">
+    <div className="max-w-3xl mx-auto px-4">
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-nubinix-blue/10 mb-4">
-          <FileText size={32} className="text-nubinix-blue" />
-        </div>
-        <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] bg-clip-text text-transparent">
-          Choose Report Frequency
-        </h2>
-        <p className="text-gray-500">
-          Select how often you want your report to be generated.
-        </p>
+        <h2 className="text-2xl font-semibold mb-2">Select Report Type</h2>
+        <p className="text-gray-600">Choose what type of report you want to generate</p>
       </div>
 
-      <RadioGroup 
-        value={frequency || undefined} 
-        onValueChange={(value: ReportFrequency) => onFrequencyChange(value)}
-        className="space-y-4 mb-8"
-      >
-        <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-gray-50 cursor-pointer">
-          <RadioGroupItem value="daily" id="daily" />
-          <Label htmlFor="daily" className="flex-1 cursor-pointer flex items-center">
-            <div className="flex items-center">
-              <div className="mr-3 bg-blue-100 p-2 rounded-full">
-                <CalendarDays size={20} className="text-blue-600" />
-              </div>
-              <div>
-                <div className="font-medium">Daily Report</div>
-                <div className="text-sm text-gray-500">Get a new report every day</div>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div 
+          className={`border rounded-lg p-6 cursor-pointer hover:border-blue-500 transition-all ${
+            reportType === 'utilization' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+          }`}
+          onClick={() => onReportTypeChange('utilization')}
+        >
+          <div className="flex flex-col items-center">
+            <div className="bg-blue-100 p-4 rounded-full mb-4">
+              <svg className="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
             </div>
-          </Label>
+            <h3 className="text-lg font-semibold mb-1">Utilization Report</h3>
+            <p className="text-sm text-gray-500 text-center">Resource usage across your cloud instances</p>
+          </div>
         </div>
-        
-        <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-gray-50 cursor-pointer">
-          <RadioGroupItem value="weekly" id="weekly" />
-          <Label htmlFor="weekly" className="flex-1 cursor-pointer flex items-center">
-            <div className="flex items-center">
-              <div className="mr-3 bg-purple-100 p-2 rounded-full">
-                <Calendar size={20} className="text-purple-600" />
-              </div>
-              <div>
-                <div className="font-medium">Weekly Report</div>
-                <div className="text-sm text-gray-500">Get a comprehensive weekly summary</div>
-              </div>
-            </div>
-          </Label>
-        </div>
-        
-        <div className="flex items-center space-x-2 border rounded-md p-4 hover:bg-gray-50 cursor-pointer">
-          <RadioGroupItem value="monthly" id="monthly" />
-          <Label htmlFor="monthly" className="flex-1 cursor-pointer flex items-center">
-            <div className="flex items-center">
-              <div className="mr-3 bg-green-100 p-2 rounded-full">
-                <FileText size={20} className="text-green-600" />
-              </div>
-              <div>
-                <div className="font-medium">Monthly Report</div>
-                <div className="text-sm text-gray-500">Get a detailed monthly analysis</div>
-              </div>
-            </div>
-          </Label>
-        </div>
-      </RadioGroup>
 
-      <div className="flex space-x-4">
-        <Button 
-          variant="outline" 
+        <div 
+          className={`border rounded-lg p-6 cursor-pointer hover:border-blue-500 transition-all ${
+            reportType === 'billing' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+          }`}
+          onClick={() => onReportTypeChange('billing')}
+        >
+          <div className="flex flex-col items-center">
+            <div className="bg-blue-100 p-4 rounded-full mb-4">
+              <svg className="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-1">Monthly Bill</h3>
+            <p className="text-sm text-gray-500 text-center">Cost breakdown by service and resource</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between mt-8">
+        <Button
           onClick={onBack}
-          className="flex-1"
+          variant="outline"
+          className="px-6"
         >
           Back
         </Button>
-        <Button 
-          onClick={onNext} 
-          disabled={!frequency}
-          className="flex-1 bg-nubinix-purple hover:bg-nubinix-purple/90"
+        <Button
+          onClick={onNext}
+          disabled={!reportType}
+          className="bg-blue-400 hover:bg-blue-500 text-white rounded px-6"
         >
-          Generate Report
+          Next
         </Button>
       </div>
     </div>

@@ -1,27 +1,17 @@
 
 import React from 'react';
-import { FileText, HelpCircle, Info } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="py-6 border-t mt-auto">
-      <div className="container mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <div className="mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} Nubinix. All rights reserved.
+    <footer className="bg-gradient-to-r from-[#38bdf8] via-[#8250df] to-[#e11d48] text-white py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center">
+          <div className="text-sm">
+            &copy; 2025 Nubinix. All rights reserved.
           </div>
-          <div className="flex space-x-6">
-            <a href="#" className="flex items-center hover:text-nubinix-purple transition-colors">
-              <FileText size={16} className="mr-1" />
-              Documentation
-            </a>
-            <a href="#" className="flex items-center hover:text-nubinix-purple transition-colors">
-              <HelpCircle size={16} className="mr-1" />
-              Support
-            </a>
-            <a href="#" className="flex items-center hover:text-nubinix-purple transition-colors">
-              <Info size={16} className="mr-1" />
-              About
+          <div>
+            <a href="https://www.nubinix.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-opacity-80 transition-opacity">
+              www.nubinix.com
             </a>
           </div>
         </div>

@@ -1,0 +1,17 @@
+name: Test AWS Lambda Function
+
+on:
+  push:
+    branches:
+      - testing
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: List files in the repository
+      run: ls -R
